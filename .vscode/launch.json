@@ -1,0 +1,20 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "AnimeRox",
+      "type": "dart",
+      "request": "launch",
+      "program": "lib/main.dart",
+      "args": ["--flavor", "animefox", "--target", "lib/flavor/animefox/main_animefox.dart" ]
+    },
+    {
+      "name": "AnimeRush",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart",
+      "args": ["--flavor", "animerush", "--target", "lib/flavor/animerush/main_animerush.dart" ]
+    }
+  ],
+  "compounds": []
+}

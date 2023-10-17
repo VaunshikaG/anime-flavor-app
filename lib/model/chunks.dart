@@ -1,0 +1,7 @@
+// class ChunksModel {
+//   int?
+//
+//   ChunksModel({
+//   });
+//
+// }

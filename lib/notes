@@ -1,0 +1,147 @@
+1. change package name to "com" in the necessary files.
+
+2. replace code in android/app/src/main/AndroidManifest.xml file.
+        <application
+            android:label="@string/app_name"
+            android:name="${applicationName}"
+            android:icon="${appIcon}">
+        ...
+        </application>
+
+3. move MainActivity file to com dir.
+
+4. add required code in app/build.gradle
+        in defaultConfig set applicationId "com"
+        add following code after defaultConfig
+        flavorDimensions "app"
+            productFlavors {
+                {newApp} {
+                    dimension "app"
+                    applicationId "com.{newApp}"
+                    versionCode 1
+                    versionName "1.0.0"
+                    resValue "string", "app_name", "{newApp}"
+                    manifestPlaceholders = [
+                            appIcon: "@mipmap/ic_launcher_ar",
+                    ]
+                    applicationIdSuffix ".{newApp}"
+                }
+            }
+
+5. create & add appIcons in res dir.
+
+6. create {newApp} dir in assets/imgs.
+        add icon, logo, white_logo in it.
+
+7. create flutter_launcher_icons_{newApp}.yaml
+        add icon path in it as follows
+        flutter_icons:
+          android: true
+          ios: true
+          image_path: "assets/img/{newApp}/icon1.png"
+
+8. create FlavorConfig.dart
+        enum Flavor {
+          dev, prod
+        }
+
+        class FlavorValues {
+          String appName;
+          String packageName;
+          String appUrl;
+          String webCode;
+          Color mainColor;
+          Color color2;
+          String icon;
+          String logo;
+          String whiteLogo;
+          ThemeData theme;
+          String versionCode;
+          String versionName;
+
+          FlavorValues({
+            required this.appName,
+            required this.packageName,
+            required this.appUrl,
+            required this.webCode,
+            required this.mainColor,
+            required this.color2,
+            required this.icon,
+            required this.logo,
+            required this.whiteLogo,
+            required this.theme,
+            required this.versionCode,
+            required this.versionName,
+          });
+        }
+
+        class FlavorConfig {
+          final Flavor flavor;
+          final String env;
+          final String name;
+          final FlavorValues? values;
+          static FlavorConfig? _instance;
+
+          factory FlavorConfig({
+            required Flavor flavor,
+            required String name,
+            required String env,
+            required FlavorValues values}) {
+            _instance ??= FlavorConfig._internal(
+                flavor, name, env, values);
+            return _instance!;
+          }
+
+          FlavorConfig._internal(this.flavor, this.name, this.env, this.values);
+
+          static FlavorConfig? get instance => _instance;
+
+          static bool isDev() => _instance!.flavor == Flavor.dev;
+
+          static bool isProd() => _instance!.flavor == Flavor.prod;
+        }
+
+9. create dir flavor/{newApp}
+        create main_{newApp}.dart in it with following code.
+        void main() {
+          mainCommon(
+            config: FlavorConfig(
+              name: 'dev',
+              env: 'dev',
+              flavor: Flavor.dev,
+              values: FlavorValues(
+                appName: 'dev',
+                packageName: 'com.dev',
+                appUrl: 'https://dev.in/api',
+                webCode: 'dev',
+                mainColor: CupertinoColors.activeOrange.darkColor,
+                color2: const Color(0xFFFFB339),
+                icon: 'assets/img/dev/icon1.png',
+                logo: 'assets/img/dev/logo.png',
+                whiteLogo: 'assets/img/dev/white_logo.png',
+                theme: AppTheme.dev,
+                versionCode: '1',
+                versionName: '1.0.0',
+              ),
+            ),
+          );
+        }
+
+
+10. in main.dart
+        replace main() with mainCommon() as follows
+        Future<void> mainCommon({required FlavorConfig config}) async {
+            WidgetsFlutterBinding.ensureInitialized();
+            flavorConfigProvider = StateProvider((ref) => config);
+            runApp(const ProviderScope(child: MyApp()));
+        } 
+
+11. to apply FlavorConfig to any field use
+        FlavorConfig.instance!.{value_you_want_to_access}
+
+12. to run the flavor use command
+        flutter run --flavor {newApp} -t lib/flavor/{newApp}/main_{newApp}.dart
+
+13. to build apk of flavor use command
+        flutter build apk --flavor {newApp}     or      flutter build appbundle --flavor {newApp}
+
